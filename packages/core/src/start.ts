@@ -71,10 +71,15 @@ export async function start(mode: Mode) {
   } else throw new Error('MCP_TRANSPORT must be stdio or http');
 }
 export function run(mode: Mode) {
-  start(mode).catch(() => {
-    process.stderr.write(
-      'Server startup failed. Check configuration, secret permissions and transport settings.\n',
-    );
+  start(mode).catch((error: unknown) => {
+    // Startup failures come from locally validated configuration or secret-file
+    // checks. Emit only the controlled message, never the error object: HTTP
+    // clients and Google libraries can include credentials in their objects.
+    const detail =
+      error instanceof Error
+        ? error.message.replace(/[\r\n]+/g, ' ').slice(0, 240)
+        : 'Unknown configuration error';
+    process.stderr.write(`Server startup failed: ${detail}\n`);
     process.exit(1);
   });
 }
