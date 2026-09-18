@@ -1,0 +1,47 @@
+{
+  "name": "google-marketing-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-hosted read-only Google Search Console and GA4 MCP servers",
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
+  },
+  "bin": {
+    "gsc-mcp": "dist/packages/gsc-mcp/src/index.js",
+    "ga4-mcp": "dist/packages/ga4-mcp/src/index.js",
+    "google-marketing-mcp": "dist/packages/google-mcp/src/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+    "lint": "eslint packages tests",
+    "test": "npm run build && vitest run",
+    "check": "npm run lint && npm run typecheck && npm test",
+    "start:gsc": "node dist/packages/gsc-mcp/src/index.js",
+    "start:ga4": "node dist/packages/ga4-mcp/src/index.js",
+    "start": "node dist/packages/google-mcp/src/index.js",
+    "auth": "node dist/packages/core/src/oauth-setup.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.0",
+    "google-auth-library": "11.1.0",
+    "jose": "^6.2.12",
+    "yaml": "^2.8.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^10.10.0",
+    "prettier": "^3.9.8",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^4.1.11"
+  }
+}

@@ -1,0 +1,27 @@
+# Relative paths resolve from this YAML file, not the working directory.
+credentials:
+  default:
+    type: oauth
+    clientFile: ../secrets/oauth-client.json
+    tokenFile: ../secrets/google-token.enc
+  workload:
+    type: adc
+  # service:
+  #   type: service_account
+  #   keyFile: ../secrets/service-account.json
+projects:
+  example:
+    googleCloudProjectId: my-google-cloud-project
+    credential: default
+    discovery: false # true allows discovery of ALL properties visible to this identity
+    searchConsole:
+      siteUrl: sc-domain:example.com
+    analytics:
+      propertyId: '123456789'
+  another:
+    googleCloudProjectId: another-cloud-project
+    credential: workload
+    searchConsole:
+      siteUrl: https://www.example.org/
+    analytics:
+      propertyId: '987654321'

@@ -1,0 +1,44 @@
+x-common: &common
+  build: .
+  restart: unless-stopped
+  user: '${MCP_UID:-1000}:${MCP_GID:-1000}'
+  init: true
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 128
+  mem_limit: 512m
+  cpus: 1
+  tmpfs: [/tmp:size=16m, mode=1777]
+  volumes:
+    - ./config:/app/config:ro
+    - ./secrets:/app/secrets:ro
+  environment: &environment
+    PROJECTS_CONFIG: /app/config/projects.yaml
+    TOKEN_ENCRYPTION_KEY_FILE: /app/secrets/token-key.txt
+    MCP_AUTH_TOKEN_FILE: /app/secrets/mcp-bearer.txt
+    MCP_TRANSPORT: http
+    MCP_HOST: 0.0.0.0
+    MCP_PORT: 3000
+    MCP_ALLOWED_HOSTS: ${MCP_ALLOWED_HOSTS:-localhost,127.0.0.1}
+    MCP_ALLOWED_ORIGINS: ${MCP_ALLOWED_ORIGINS:-}
+    MCP_AUTH_MODE: ${MCP_AUTH_MODE:-bearer}
+    MCP_RESOURCE_URL: ${MCP_RESOURCE_URL:-}
+    MCP_OAUTH_ISSUER: ${MCP_OAUTH_ISSUER:-}
+    MCP_OAUTH_JWKS_URL: ${MCP_OAUTH_JWKS_URL:-}
+    MCP_OAUTH_SCOPE: ${MCP_OAUTH_SCOPE:-mcp:read}
+services:
+  google-mcp:
+    <<: *common
+    profiles: [combined]
+    ports: ['127.0.0.1:3000:3000']
+  gsc-mcp:
+    <<: *common
+    profiles: [split]
+    command: [node, dist/packages/gsc-mcp/src/index.js]
+    ports: ['127.0.0.1:3001:3000']
+  ga4-mcp:
+    <<: *common
+    profiles: [split]
+    command: [node, dist/packages/ga4-mcp/src/index.js]
+    ports: ['127.0.0.1:3002:3000']
