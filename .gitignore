@@ -8,3 +8,4 @@ secrets/
 config/projects.yaml
 *.log
 *.tgz
+*.swp
