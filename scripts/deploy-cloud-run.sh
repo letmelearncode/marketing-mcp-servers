@@ -65,12 +65,27 @@ gcloud run deploy "$service_name" \
   --set-env-vars '^@^MCP_ALLOWED_HOSTS=localhost,127.0.0.1' \
   --quiet
 
-service_url="$(gcloud run services describe "$service_name" --project "$GOOGLE_CLOUD_PROJECT" --region "$region" --format='value(status.url)')"
-service_host="${service_url#https://}"
+# Cloud Run publishes both a regional and legacy-compatible run.app hostname.
+# Pin every published hostname; status.url alone is not guaranteed to return
+# the endpoint preferred by a client.
+hosts="$(gcloud run services describe "$service_name" --project "$GOOGLE_CLOUD_PROJECT" --region "$region" --format=json | node -e '
+  let input = "";
+  process.stdin.on("data", (part) => (input += part));
+  process.stdin.on("end", () => {
+    const service = JSON.parse(input);
+    const raw = service.metadata?.annotations?.["run.googleapis.com/urls"] ?? "[]";
+    for (const url of JSON.parse(raw)) console.log(new URL(url).hostname);
+  });
+')"
+allowed_hosts='localhost,127.0.0.1'
+while IFS= read -r host; do
+  [ -n "$host" ] && allowed_hosts="$allowed_hosts,$host"
+done <<< "$hosts"
 gcloud run services update "$service_name" \
   --project "$GOOGLE_CLOUD_PROJECT" \
   --region "$region" \
-  --update-env-vars "^@^MCP_ALLOWED_HOSTS=localhost,127.0.0.1,$service_host" \
+  --update-env-vars "^@^MCP_ALLOWED_HOSTS=$allowed_hosts" \
   --quiet >/dev/null
 
+service_url="$(gcloud run services describe "$service_name" --project "$GOOGLE_CLOUD_PROJECT" --region "$region" --format='value(status.url)')"
 printf 'Cloud Run MCP endpoint: %s/mcp\n' "$service_url"
