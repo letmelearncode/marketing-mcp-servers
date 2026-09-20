@@ -1,0 +1,21 @@
+# Use Cloud Run's service identity. Do not add a service-account key file.
+credentials:
+  cloud_run:
+    type: adc
+projects:
+  jyoti-mitra:
+    googleCloudProjectId: astromitra
+    credential: cloud_run
+    discovery: false
+    searchConsole:
+      siteUrl: https://jyotimitra.in/
+    analytics:
+      propertyId: '552476828'
+  kiranax:
+    googleCloudProjectId: kiranax-ee026
+    credential: cloud_run
+    discovery: false
+    searchConsole:
+      siteUrl: https://www.kiranax.in/
+    analytics:
+      propertyId: '518110322'

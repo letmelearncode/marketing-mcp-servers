@@ -196,6 +196,10 @@ The image runs unprivileged with a read-only filesystem, no Linux capabilities, 
 
 A `render.yaml` Blueprint deploys the combined server as a native Node web service. `scripts/render-start.sh` rebuilds the gitignored `config/projects.yaml` and `secrets/` files from Render environment variables on every boot. Use a service-account credential profile (the OAuth helper cannot run on Render). See [Render deployment](docs/render.md).
 
+## Deploy to Google Cloud Run
+
+Cloud Run is recommended for occasional remote MCP use: it scales to zero when idle and provides a managed HTTPS endpoint. The Cloud Run deployment uses a dedicated runtime service identity with short-lived ADC credentials, so no Google service-account key is stored or uploaded. See [Cloud Run deployment](docs/cloud-run.md).
+
 ## Architecture and development
 
 ```text
