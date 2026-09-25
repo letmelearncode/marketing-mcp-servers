@@ -1,5 +1,7 @@
 # Deploy to Render
 
+> Status: on hold. Render's free-tier monthly quota was exhausted (services suspended until reset), so production runs on Cloud Run instead — see [cloud-run.md](cloud-run.md). Keep this file for the free-tier fallback.
+
 Deploys the combined server as a Render web service (native Node runtime) using the `render.yaml` Blueprint in the repo root. The entrypoint `scripts/render-start.sh` materializes the gitignored `config/projects.yaml` and `secrets/` files from environment variables at every boot, maps Render's `$PORT`, binds `0.0.0.0`, and appends the public hostname to `MCP_ALLOWED_HOSTS`.
 
 ## Prerequisites

@@ -192,9 +192,11 @@ Do not run as UID 0. If your deployment uses UID 1000, provision secret files re
 
 The image runs unprivileged with a read-only filesystem, no Linux capabilities, bounded memory/PIDs, and a liveness check. `/healthz` means the process is alive; it does not test Google permissions. Stateless HTTP uses POST requests with JSON responses; GET/DELETE return 405. It supports no sessions, resumable SSE, unsolicited notifications or legacy SSE endpoint.
 
-## Deploy to Render
+## Deploy
 
-A `render.yaml` Blueprint deploys the combined server as a native Node web service. `scripts/render-start.sh` rebuilds the gitignored `config/projects.yaml` and `secrets/` files from Render environment variables on every boot. Use a service-account credential profile (the OAuth helper cannot run on Render). See [Render deployment](docs/render.md).
+Production runs on **Google Cloud Run** (project `kognitilabs`, region `asia-south1`, scale-to-zero) using the Cloud Run service identity with ADC — no downloadable keys. See [Cloud Run deployment](docs/cloud-run.md) for setup, the deploy script, and operations.
+
+A `render.yaml` Blueprint for Render's native Node runtime is also provided (`scripts/render-start.sh` rebuilds config/secrets from env vars), but that path is currently on hold: see [Render deployment](docs/render.md).
 
 ## Deploy to Google Cloud Run
 

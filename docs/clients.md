@@ -2,6 +2,19 @@
 
 Build first (`npm ci && npm run build`) and complete the Google authorization described in the README. Replace `/ABS/google-marketing-mcp` with your repository's absolute path and use an absolute Node executable if a desktop client cannot find Node in PATH. MCP configuration contains only **file paths**, never Google refresh tokens or service-account keys.
 
+## Production endpoint (Cloud Run)
+
+The live server is at `https://google-marketing-mcp-har4tkg4ja-el.a.run.app/mcp` with the static bearer token from `secrets/mcp-bearer.txt` (deploy with `scripts/deploy-cloud-run.sh`; see [cloud-run.md](cloud-run.md)). Example Codex remote entry (`~/.codex/config.toml`):
+
+```toml
+[mcp_servers.google_marketing_remote]
+url = "https://google-marketing-mcp-har4tkg4ja-el.a.run.app/mcp"
+bearer_token_env_var = "GOOGLE_MARKETING_MCP_TOKEN"
+tool_timeout_sec = 75
+```
+
+Set `GOOGLE_MARKETING_MCP_TOKEN` in the client process environment. First call `projects_list`, then one small report — tool listing alone does not prove Google property access.
+
 ## Claude Desktop, Claude Code and Cursor: stdio
 
 Use this `mcpServers` object in Claude Desktop's MCP configuration, a Claude Code `.mcp.json`, or Cursor's `.cursor/mcp.json`. Local/user configuration is preferable to committing machine-specific paths.

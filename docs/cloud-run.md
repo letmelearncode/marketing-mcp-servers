@@ -44,10 +44,25 @@ The script builds from source, creates or versions two Secret Manager secrets, g
 Connect a static-bearer MCP client to:
 
 ```text
-https://YOUR_CLOUD_RUN_URL/mcp
+https://google-marketing-mcp-har4tkg4ja-el.a.run.app/mcp
 ```
 
-Send the bearer token from `secrets/mcp-bearer.txt` through the client’s secret mechanism. It is an MCP access token, not a Google credential.
+Send the bearer token from `secrets/mcp-bearer.txt` through the client’s secret mechanism. It is an MCP access token, not a Google credential. Per-client configuration examples are in [clients.md](clients.md).
+
+## Live deployment (2026-09-25)
+
+- Project `kognitilabs`, region `asia-south1`, service `google-marketing-mcp` (`min-instances: 0`, `max-instances: 2`, 512Mi).
+- Runtime identity `google-marketing-mcp-runtime@kognitilabs.iam.gserviceaccount.com` with `roles/serviceusage.serviceUsageConsumer` on `kognitilabs`, `astromitra`, and `kiranax-ee026`.
+- Secret Manager secrets `google-marketing-mcp-projects` and `google-marketing-mcp-bearer` (versioned; each deploy adds a version, preserving rollback).
+- Cost guardrail: billing budget `kognitilabs MCP guardrail`, ₹500/month on `kognitilabs`, alerts at 50/90/100% to the billing admins plus `iamabhi3913@gmail.com`.
+- Verified live: `projects_list`, `ga4_realtime`, `gsc_sitemaps_list`, and all 15 tools listed over authenticated HTTPS; unauthenticated `/mcp` returns 401.
+
+## Operational lessons
+
+- **Property variant matters.** Search Console treats `https://jyotimitra.in/`, `https://www.jyotimitra.in/`, and `sc-domain:jyotimitra.in` as separate properties. The service account held Full user on the _domain_ property while the config pointed at the _URL-prefix_ property, producing `404 not a verified site`. List exactly what an identity can see with `GET /webmasters/v3/sites` before assuming a grant is missing.
+- **Check grants by impersonation.** `gcloud auth print-access-token --impersonate-service-account=<sa> --scopes=<read-only scopes>` plus direct Search Console / Analytics Admin REST calls shows ground truth. The impersonator needs `roles/iam.serviceAccountTokenCreator` on the SA (grant, verify, optionally remove afterwards).
+- **Exact `/healthz` quirk.** On `run.app` URLs the bare path `/healthz` returns a Google 404 page that never reaches the container, while `/healthz/` returns the app's `{"status":"ok"}`. Do not use bare `/healthz` for uptime monitors; probe `/healthz/` or authenticated `/mcp` behavior instead.
+- **Logs.** `gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="google-marketing-mcp"' --project kognitilabs` shows startup lines and `express-rate-limit` proxy warnings (harmless behind Cloud Run's proxy; rate limiting still applies).
 
 ## Validate and operate
 
