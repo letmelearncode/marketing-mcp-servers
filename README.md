@@ -194,13 +194,9 @@ The image runs unprivileged with a read-only filesystem, no Linux capabilities, 
 
 ## Deploy
 
-Production runs on **Google Cloud Run** (project `kognitilabs`, region `asia-south1`, scale-to-zero) using the Cloud Run service identity with ADC — no downloadable keys. See [Cloud Run deployment](docs/cloud-run.md) for setup, the deploy script, and operations.
+Production runs on **Google Cloud Run** (project `kognitilabs`, region `asia-south1`, scale-to-zero) using the dedicated runtime service identity with short-lived ADC credentials — no Google service-account key is stored or uploaded. Occasional remote MCP use fits its request-based billing; cold starts after idle are expected. See [Cloud Run deployment](docs/cloud-run.md) for setup, the deploy script, live-deployment record, and operations.
 
 A `render.yaml` Blueprint for Render's native Node runtime is also provided (`scripts/render-start.sh` rebuilds config/secrets from env vars), but that path is currently on hold: see [Render deployment](docs/render.md).
-
-## Deploy to Google Cloud Run
-
-Cloud Run is recommended for occasional remote MCP use: it scales to zero when idle and provides a managed HTTPS endpoint. The Cloud Run deployment uses a dedicated runtime service identity with short-lived ADC credentials, so no Google service-account key is stored or uploaded. See [Cloud Run deployment](docs/cloud-run.md).
 
 ## Architecture and development
 
